@@ -48,7 +48,7 @@ app.get('/books/:id', async(req, res) => {
     const section = $(".singleBook")
     const title = section.querySelector('.container .pageContent article .details h2').textContent;
     const author =  section.querySelector('.container .pageContent article .details .author').textContent.trim()
-    const authorId =  section.querySelector('.container .pageContent article .details .author a').getAttribte('href')
+    const authorId =  section.querySelector('.container .pageContent article .details .author a').getAttribute('href');
     const img =  section.querySelector('.container .pageContent article .cover img').getAttribute('src')
     const typeText = section.querySelector('.container .pageContent article .details .tags li a').textContent.trim();
     const typeUrl = section.querySelector('.container .pageContent article .details .tags li a').getAttribute('href');
@@ -96,6 +96,7 @@ app.get('/books/:id', async(req, res) => {
         text,
         downloadLinks,
         date,
+        aboutAuthor,
         contents,
       }
     )  
