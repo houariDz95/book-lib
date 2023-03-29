@@ -48,7 +48,7 @@ app.get('/book/:id', async(req, res) => {
     const section = $(".singleBook")
     const title = section.querySelector('.container .pageContent article .details h2').textContent;
     const author =  section.querySelector('.container .pageContent article .details .author').textContent.trim()
-    const authorId =  section.querySelector('.container .pageContent article .details .author a').getAttribute('href').replace(/\/contributors/, "");
+    const authorId =  section.querySelector('.container .pageContent article .details .author a').getAttribute('href').replace(/\/contributors/, "").  authorId.replaceAll("/", "");
     const img =  section.querySelector('.container .pageContent article .cover img').getAttribute('src')
     const typeText = section.querySelector('.container .pageContent article .details .tags li a').textContent.trim();
     const typeUrl = section.querySelector('.container .pageContent article .details .tags li a').getAttribute('href');
@@ -78,7 +78,7 @@ app.get('/book/:id', async(req, res) => {
         }
       )
     })
-    const aboutAuthor = section.querySelector('div > main > div.aboutAuthor').textContent.replace(/\s*/, " ")
+    const aboutAuthor = section.querySelector('div > main > div.aboutAuthor').textContent.replace(/\s*/, " ").replace(/\عن المؤلف/, " ").trim()
   
     const type = {
       genre: typeText,
@@ -89,15 +89,15 @@ app.get('/book/:id', async(req, res) => {
       {
         title,
         author,
-       //authorId:  authorId.replaceAll("/", ""),
+       authorId,
         img,
-       // type,
+       type,
         words, 
         text,
-        //downloadLinks,
+        downloadLinks,
         date,
-        //aboutAuthor: aboutAuthor.replace(/\عن المؤلف/, " ").trim(),
-        //contents,
+        aboutAuthor,
+        contents,
       }
     )  
   }catch(error){
@@ -152,12 +152,12 @@ app.get('/categories/:title', async(req, res) => {
       const ul = $('body > div > section.allBooks > div > main > div.books_covers > ul');
       const allBooks = ul.querySelectorAll('li');
       allBooks.forEach(book => {
-        const id = book.querySelector('a').getAttribute('href').replace(/\/books/, "");
+        const id = book.querySelector('a').getAttribute('href').replace(/\/books/, "").replaceAll("/", "");
         const img = book.querySelector('a img').getAttribute('src');
         const title = book.querySelector('a img').getAttribute('alt');
   
         books.push({
-          id: id.replaceAll("/", ""),
+          id,
           title,
           img
         })
