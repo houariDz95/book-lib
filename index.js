@@ -1,5 +1,4 @@
 import express from 'express';
-import books from './routes/books.js'
 import axios from 'axios';
 import {JSDOM} from 'jsdom';
 import {getNumberOfBooks} from './utils/getNumberOfBooks.js';
@@ -39,9 +38,8 @@ app.get('/books', async(req, res) =>{
 })
 
 app.get('/book/:id', async(req, res) =>{
-  const {id} = req.params;
-
   try{
+    const {id} = req.params;
     const response = await axios.get(`https://www.hindawi.org/books/${id}`)
     const dom = new JSDOM(response.data);
     const $ = (select) => dom.window.document.querySelector(select);
