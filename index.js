@@ -96,7 +96,6 @@ app.get('/books/:id', async(req, res) => {
         text,
         downloadLinks,
         date,
-        aboutAuthor,
         contents,
       }
     )  
