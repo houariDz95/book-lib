@@ -38,7 +38,7 @@ app.get('/books', async(req, res) =>{
 })
 
 
-app.get('/book/:id', async(req, res) => {
+app.get('/books/:id', async(req, res) => {
   const {id} = req.params;
   try{
     const response = await axios.get(`https://www.hindawi.org/books/${id}`)
@@ -106,7 +106,7 @@ app.get('/book/:id', async(req, res) => {
 })
 
 
-app.get('/author/:id', async(req, res) => {
+app.get('/contributors/:id', async(req, res) => {
   const {id} = req.params;
   try{
     const response = await axios.get(`https://www.hindawi.org/contributors/${id}`)
