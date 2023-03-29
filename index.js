@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 5000
 app.get('/', (req, res) => {res.send("welcome to hundawi scraper api")})
 app.use('/api/books', books)
 
-app.get('/autor', async(req, res) => {
+app.get('/autor/:id', async(req, res) => {
   const {id} = req.params;
   try{
     const response = await axios.get(`https://www.hindawi.org/contributors/${id}`)
