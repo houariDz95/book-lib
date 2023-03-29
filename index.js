@@ -89,15 +89,15 @@ app.get('/book/:id', async(req, res) => {
       {
         title,
         author,
-        authorId:  authorId.replaceAll("/", ""),
+       //authorId:  authorId.replaceAll("/", ""),
         img,
-        type,
+       // type,
         words, 
         text,
-        downloadLinks,
+        //downloadLinks,
         date,
-        aboutAuthor: aboutAuthor.replace(/\عن المؤلف/, " ").trim(),
-        contents,
+        //aboutAuthor: aboutAuthor.replace(/\عن المؤلف/, " ").trim(),
+        //contents,
       }
     )  
   }catch(error){
