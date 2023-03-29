@@ -48,7 +48,7 @@ app.get('/book/:id', async(req, res) => {
     const section = $(".singleBook")
     const title = section.querySelector('.container .pageContent article .details h2').textContent;
     const author =  section.querySelector('.container .pageContent article .details .author').textContent.trim()
-    const authorId =  section.querySelector('.container .pageContent article .details .author a').getAttribute('href').replace(/\/contributors/, "").  authorId.replaceAll("/", "");
+    const authorId =  section.querySelector('.container .pageContent article .details .author a');
     const img =  section.querySelector('.container .pageContent article .cover img').getAttribute('src')
     const typeText = section.querySelector('.container .pageContent article .details .tags li a').textContent.trim();
     const typeUrl = section.querySelector('.container .pageContent article .details .tags li a').getAttribute('href');
@@ -183,8 +183,8 @@ app.get('/search/:keyword', async(req, res) => {
       const bookInfo = result.querySelector("a:nth-child(1)")
       const authorInfo = result.querySelector("a:nth-child(2)")
       searchResults.push({
-        bookId: bookInfo.getAttribute('href').replace(/\/books/, "").replaceAll('/', ""),
-        authorId: authorInfo.getAttribute('href').replace(/\/contributors/, "").replaceAll('/', ""),
+        bookId: bookInfo.getAttribute('href'),
+        authorId: authorInfo.getAttribute('href'),
         bookTitle: bookInfo.textContent,
         authorTitle: authorInfo.textContent,
       })
