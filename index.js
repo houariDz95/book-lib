@@ -152,7 +152,7 @@ app.get('/categories/:title', async(req, res) => {
       const ul = $('body > div > section.allBooks > div > main > div.books_covers > ul');
       const allBooks = ul.querySelectorAll('li');
       allBooks.forEach(book => {
-        const id = book.querySelector('a').getAttribute('href').replace(/\/books/, "").replaceAll("/", "");
+        const id = book.querySelector('a').getAttribute('href');
         const img = book.querySelector('a img').getAttribute('src');
         const title = book.querySelector('a img').getAttribute('alt');
   
