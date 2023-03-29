@@ -6,7 +6,7 @@ import {getAuthorInfo} from '../controllers/getAuthorInfo.js'
 import {searchData} from '../controllers/search.js'
 const router = express.Router();
 
-router.get('/book/:id', getBook);
+router.get('/:id', getBook);
 router.get('/', getBooks);
 router.get('/category/:title', getSpesificBooks);
 router.get('/author/:id', getAuthorInfo);
