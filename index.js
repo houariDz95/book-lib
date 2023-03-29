@@ -37,9 +37,10 @@ app.get('/books', async(req, res) =>{
   }
 })
 
-app.get('/book/:id', async(req, res) =>{
+
+app.get('/book/:id', async(req, res) => {
+  const {id} = req.params;
   try{
-    const {id} = req.params;
     const response = await axios.get(`https://www.hindawi.org/books/${id}`)
     const dom = new JSDOM(response.data);
     const $ = (select) => dom.window.document.querySelector(select);
@@ -102,8 +103,8 @@ app.get('/book/:id', async(req, res) =>{
   }catch(error){
     res.json(error)
   }
-
 })
+
 
 app.get('/author/:id', async(req, res) => {
   const {id} = req.params;
