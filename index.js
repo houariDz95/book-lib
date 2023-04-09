@@ -12,7 +12,7 @@ app.get('/books', async (req, res) => {
   const { numberOfPages } = await getNumberOfBooks(`https://www.hindawi.org/books/`);
 
   try {
-    for (let i = 1; i <= numberOfPages / 2; i++) {
+    for (let i = 1; i <= numberOfPages; i++) {
       const response = await axios.get(`https://www.hindawi.org/books/${i}/`);
       const dom = new JSDOM(response.data);
       const $ = (select) => dom.window.document.querySelector(select);
@@ -194,5 +194,50 @@ app.get('/search/:keyword', async (req, res) => {
     res.json(error)
   }
 })
+
+app.get('/catList', async(req, res) => {
+  try {
+    const response = await axios.get(`https://www.hindawi.org/books/`);
+    const dom = new JSDOM(response.data);
+    const $ = (select) => dom.window.document.querySelector(select);
+    const ul = $("section.allBooks > div > aside > ul > li:nth-child(1) > ul")
+    const categories = ul.querySelectorAll('li');
+    const list = []
+    categories.forEach(cat => {
+      const title = cat.querySelector('a').getAttribute('href').replaceAll(/\/books\/categories?/gi, "").replaceAll("/", "")
+      list.push(title)
+    })
+    res.json(list.slice(1, list.length))
+  } catch (error) {
+    res.json(error)
+  }
+})
+
+app.get('/new', async (req, res) => {
+  const books = []
+
+  try {
+      const response = await axios.get(`https://www.hindawi.org/`);
+      const dom = new JSDOM(response.data);
+      const $ = (select) => dom.window.document.querySelector(select);
+      const ul = $('main .slide-section .container .swiper .swiper-wrapper');
+      const allBooks = ul.querySelectorAll('li');
+      allBooks.forEach(book => {
+        const id = book.querySelector('a').getAttribute('href');
+        const img = book.querySelector('a img').getAttribute('src');
+        const title = book.querySelector('a img').getAttribute('alt');
+
+        books.push({
+          id,
+          title,
+          img
+        })
+      })
+    res.json(books)
+  } catch (error) {
+    res.json(error)
+  }
+})
+
 
 app.listen(PORT, () => console.log(`surver runnin on port ${PORT}`))
