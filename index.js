@@ -1,28 +1,28 @@
 import express from 'express';
 import axios from 'axios';
-import {JSDOM} from 'jsdom';
-import {getNumberOfBooks} from './utils/getNumberOfBooks.js';
+import { JSDOM } from 'jsdom';
+import { getNumberOfBooks } from './utils/getNumberOfBooks.js';
 const app = express();
 const PORT = process.env.PORT || 5000
 
-app.get('/', (req, res) => {res.send("welcome to hundawi scraper api")})
+app.get('/', (req, res) => { res.send("welcome to hundawi scraper api") })
 
-app.get('/books', async(req, res) =>{
+app.get('/books', async (req, res) => {
   const books = []
-  const {numberOfPages} = await getNumberOfBooks(`https://www.hindawi.org/books/`);
+  const { numberOfPages } = await getNumberOfBooks(`https://www.hindawi.org/books/`);
 
-  try{
-    for(let i = 1; i <= numberOfPages; i++){
+  try {
+    for (let i = 1; i <= numberOfPages / 2; i++) {
       const response = await axios.get(`https://www.hindawi.org/books/${i}/`);
       const dom = new JSDOM(response.data);
       const $ = (select) => dom.window.document.querySelector(select);
       const ul = $('body > div > section.allBooks > div > main > div.books_covers > ul');
       const allBooks = ul.querySelectorAll('li');
       allBooks.forEach(book => {
-        const id = book.querySelector('a').getAttribute('href').replace("/books/", "").replace("/", "");
+        const id = book.querySelector('a').getAttribute('href');
         const img = book.querySelector('a img').getAttribute('src');
         const title = book.querySelector('a img').getAttribute('alt');
-  
+
         books.push({
           id,
           title,
@@ -30,26 +30,26 @@ app.get('/books', async(req, res) =>{
         })
       })
     }
-    
+
     res.json(books)
-  }catch(error){
+  } catch (error) {
     res.json(error)
   }
 })
 
 
-app.get('/books/:id', async(req, res) => {
-  const {id} = req.params;
-  try{
+app.get('/books/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
     const response = await axios.get(`https://www.hindawi.org/books/${id}`)
     const dom = new JSDOM(response.data);
     const $ = (select) => dom.window.document.querySelector(select);
-  
+
     const section = $(".singleBook")
     const title = section.querySelector('.container .pageContent article .details h2').textContent;
-    const author =  section.querySelector('.container .pageContent article .details .author').textContent.trim()
-    const authorId =  section.querySelector('.container .pageContent article .details .author a').getAttribute('href');
-    const img =  section.querySelector('.container .pageContent article .cover img').getAttribute('src')
+    const author = section.querySelector('.container .pageContent article .details .author').textContent.trim()
+    const authorId = section.querySelector('.container .pageContent article .details .author a').getAttribute('href');
+    const img = section.querySelector('.container .pageContent article .cover img').getAttribute('src')
     const typeText = section.querySelector('.container .pageContent article .details .tags li a').textContent.trim();
     const typeUrl = section.querySelector('.container .pageContent article .details .tags li a').getAttribute('href');
     const words = section.querySelector('.container .pageContent article .details .tags li span').textContent.trim();
@@ -66,8 +66,8 @@ app.get('/books/:id', async(req, res) => {
         }
       )
     })
-  
-    
+
+
     const content = section.querySelectorAll('div > main > div.bookIndex > ul > li > a');
     const contents = []
     content.forEach(el => {
@@ -79,36 +79,36 @@ app.get('/books/:id', async(req, res) => {
       )
     })
     const aboutAuthor = section.querySelector('div > main > div.aboutAuthor').textContent.replace(/\s*/, " ").replace(/\عن المؤلف/, " ").trim()
-  
+
     const type = {
       genre: typeText,
-      url:  typeUrl.replace("/books/categories/", "").replace("/", "")
+      url: typeUrl.replace("/books/categories/", "").replace("/", "")
     }
-  
+
     res.json(
       {
         title,
         author,
-       authorId,
+        authorId,
         img,
-       type,
-        words, 
+        type,
+        words,
         text,
         downloadLinks,
         date,
         aboutAuthor,
         contents,
       }
-    )  
-  }catch(error){
+    )
+  } catch (error) {
     res.json(error)
   }
 })
 
 
-app.get('/contributors/:id', async(req, res) => {
-  const {id} = req.params;
-  try{
+app.get('/contributors/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
     const response = await axios.get(`https://www.hindawi.org/contributors/${id}`)
     const dom = new JSDOM(response.data);
     const $ = (select) => dom.window.document.querySelector(select);
@@ -121,31 +121,31 @@ app.get('/contributors/:id', async(req, res) => {
     const books = []
     li.forEach(book => {
       const id = book.querySelector('a').getAttribute('href').replace("/books/", "").replace("/", "");
-      const img =  book.querySelector('a img').getAttribute("src")
-      const title =  book.querySelector('a img').getAttribute("alt")
+      const img = book.querySelector('a img').getAttribute("src")
+      const title = book.querySelector('a img').getAttribute("alt")
       books.push({
         id,
         img,
         title
       })
     })
-  res.json({
-    name,
-    img,
-    descreption,
-    books
-  })
-  }catch(error){
+    res.json({
+      name,
+      img,
+      descreption,
+      books
+    })
+  } catch (error) {
     res.json(error)
   }
 })
 
-app.get('/categories/:title', async(req, res) => {
+app.get('/categories/:title', async (req, res) => {
   const books = []
-  const {title} = req.params
-  const {numberOfPages} = await getNumberOfBooks(`https://www.hindawi.org/books/categories/${title}/`);
-  try{
-    for(let i = 1; i <= numberOfPages; i++){
+  const { title } = req.params
+  const { numberOfPages } = await getNumberOfBooks(`https://www.hindawi.org/books/categories/${title}/`);
+  try {
+    for (let i = 1; i <= numberOfPages; i++) {
       const response = await axios.get(`https://www.hindawi.org/books/categories/${title}/${i}/`);
       const dom = new JSDOM(response.data);
       const $ = (select) => dom.window.document.querySelector(select);
@@ -155,7 +155,7 @@ app.get('/categories/:title', async(req, res) => {
         const id = book.querySelector('a').getAttribute('href');
         const img = book.querySelector('a img').getAttribute('src');
         const title = book.querySelector('a img').getAttribute('alt');
-  
+
         books.push({
           id,
           title,
@@ -163,15 +163,15 @@ app.get('/categories/:title', async(req, res) => {
         })
       })
     }
-    res.json(books)  
-  }catch(error){
+    res.json(books)
+  } catch (error) {
     res.json(error)
   }
 })
 
-app.get('/search/:keyword', async(req, res) => {
-  const {keyword} = req.params;
-  try{
+app.get('/search/:keyword', async (req, res) => {
+  const { keyword } = req.params;
+  try {
     const response = await axios.get(`https://www.hindawi.org/search/keyword/${keyword}/`);
     const dom = new JSDOM(response.data);
     const $ = (select) => dom.window.document.querySelector(select);
@@ -190,7 +190,7 @@ app.get('/search/:keyword', async(req, res) => {
       })
     })
     res.json(searchResults)
-  }catch(error){
+  } catch (error) {
     res.json(error)
   }
 })
