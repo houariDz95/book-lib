@@ -204,7 +204,7 @@ app.get('/catList', async(req, res) => {
     const categories = ul.querySelectorAll('li');
     const list = []
     categories.forEach(cat => {
-      const title = cat.querySelector('a').getAttribute('href').replaceAll(/\/books\/categories?/gi, "")
+      const title = cat.querySelector('a').getAttribute('href').replace(/\/books\/categories?/gi, "")
       list.push(title)
     })
     res.json(list.slice(1, list.length))
