@@ -116,7 +116,12 @@ app.get('/contributors/:id', async (req, res) => {
     const section = $('.singleAuthor')
     const name = section.querySelector('div > main > article > div.cover > figure > img').getAttribute('alt');
     const img = section.querySelector('div > main > article > div.cover > figure > img').getAttribute('src');
-    const descreption = section.querySelector("div > main > article > div.details > div > p").textContent;
+    const paragraphs = section.querySelectorAll("div > main > article > div.details > div p");
+    const descreption = []
+    paragraphs.forEach(paragraph => {
+      const p = paragraph.textContent
+      descreption.push(p)
+    })
     const li = section.querySelectorAll("div > main > div > ul > li")
     const books = []
     li.forEach(book => {
@@ -215,7 +220,7 @@ app.get('/catList', async(req, res) => {
 
 app.get('/new', async (req, res) => {
   const books = []
-
+  console.log(req.query.page)
   try {
       const response = await axios.get(`https://www.hindawi.org/`);
       const dom = new JSDOM(response.data);
