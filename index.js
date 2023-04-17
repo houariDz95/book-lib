@@ -116,16 +116,11 @@ app.get('/contributors/:id', async (req, res) => {
     const section = $('.singleAuthor')
     const name = section.querySelector('div > main > article > div.cover > figure > img').getAttribute('alt');
     const img = section.querySelector('div > main > article > div.cover > figure > img').getAttribute('src');
-    const paragraphs = section.querySelectorAll("div > main > article > div.details > div p");
-    const descreption = []
-    paragraphs.forEach(paragraph => {
-      const p = paragraph.textContent
-      descreption.push(p)
-    })
+    const descreption = section.querySelector("div > main > article > div.details > div ").textContent.replace(/\s*/, " ").trim()
     const li = section.querySelectorAll("div > main > div > ul > li")
     const books = []
     li.forEach(book => {
-      const id = book.querySelector('a').getAttribute('href').replace("/books/", "").replace("/", "");
+      const id = book.querySelector('a').getAttribute('href')
       const img = book.querySelector('a img').getAttribute("src")
       const title = book.querySelector('a img').getAttribute("alt")
       books.push({
