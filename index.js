@@ -2,40 +2,62 @@ import express from 'express';
 import axios from 'axios';
 import { JSDOM } from 'jsdom';
 import { getNumberOfBooks } from './utils/getNumberOfBooks.js';
+import NodeCache from 'node-cache';
+
+
+const cache = new NodeCache();
 const app = express();
 const PORT = process.env.PORT || 5000
 
 app.get('/', (req, res) => { res.send("welcome to hundawi scraper api") })
 
+
 app.get('/books', async (req, res) => {
-  const books = []
-  const { numberOfPages } = await getNumberOfBooks(`https://www.hindawi.org/books/`);
+  const cacheKey = 'booksCacheKey';
+  let books = cache.get(cacheKey);
 
-  try {
+  if (!books) {
+    const { numberOfPages } = await getNumberOfBooks(`https://www.hindawi.org/books/`);
+    const promises = [];
+
     for (let i = 1; i <= numberOfPages; i++) {
-      const response = await axios.get(`https://www.hindawi.org/books/${i}/`);
-      const dom = new JSDOM(response.data);
-      const $ = (select) => dom.window.document.querySelector(select);
-      const ul = $('body > div > section.allBooks > div > main > div.books_covers > ul');
-      const allBooks = ul.querySelectorAll('li');
-      allBooks.forEach(book => {
-        const id = book.querySelector('a').getAttribute('href');
-        const img = book.querySelector('a img').getAttribute('src');
-        const title = book.querySelector('a img').getAttribute('alt');
+      promises.push(
+        axios.get(`https://www.hindawi.org/books/${i}/`)
+          .then(response => {
+            const dom = new JSDOM(response.data);
+            const ul = dom.window.document.querySelector('body > div > section.allBooks > div > main > div.books_covers > ul');
+            const allBooks = ul.querySelectorAll('li');
+            const booksData = [];
 
-        books.push({
-          id,
-          title,
-          img
-        })
-      })
+            allBooks.forEach(book => {
+              const id = book.querySelector('a').getAttribute('href');
+              const img = book.querySelector('a img').getAttribute('src');
+              const title = book.querySelector('a img').getAttribute('alt');
+
+              booksData.push({
+                id,
+                title,
+                img
+              });
+            });
+
+            return booksData;
+          })
+          .catch(error => {
+            console.error(error);
+            return [];
+          })
+      );
     }
 
-    res.json(books)
-  } catch (error) {
-    res.json(error)
+    books = await Promise.all(promises).then(data => data.flat());
+    cache.set(cacheKey, books, 60 * 60); // cache for 1 hour
   }
-})
+
+  res.json(books);
+});
+
+
 
 
 app.get('/books/:id', async (req, res) => {
@@ -140,34 +162,42 @@ app.get('/contributors/:id', async (req, res) => {
   }
 })
 
-app.get('/categories/:title', async (req, res) => {
-  const books = []
-  const { title } = req.params
-  const { numberOfPages } = await getNumberOfBooks(`https://www.hindawi.org/books/categories/${title}/`);
-  try {
-    for (let i = 1; i <= numberOfPages; i++) {
-      const response = await axios.get(`https://www.hindawi.org/books/categories/${title}/${i}/`);
-      const dom = new JSDOM(response.data);
-      const $ = (select) => dom.window.document.querySelector(select);
-      const ul = $('body > div > section.allBooks > div > main > div.books_covers > ul');
-      const allBooks = ul.querySelectorAll('li');
-      allBooks.forEach(book => {
-        const id = book.querySelector('a').getAttribute('href');
-        const img = book.querySelector('a img').getAttribute('src');
-        const title = book.querySelector('a img').getAttribute('alt');
 
-        books.push({
-          id,
-          title,
-          img
+app.get('/categories/:title', async (req, res) => {
+  const cacheKey = `booksCacheKey_${req.params.title}`;
+  let books = cache.get(cacheKey);
+
+  if (!books) {
+    const { title } = req.params
+    const { numberOfPages } = await getNumberOfBooks(`https://www.hindawi.org/books/categories/${title}/`);
+    books = [];
+    try {
+      for (let i = 1; i <= numberOfPages; i++) {
+        const response = await axios.get(`https://www.hindawi.org/books/categories/${title}/${i}/`);
+        const dom = new JSDOM(response.data);
+        const $ = (select) => dom.window.document.querySelector(select);
+        const ul = $('body > div > section.allBooks > div > main > div.books_covers > ul');
+        const allBooks = ul.querySelectorAll('li');
+        allBooks.forEach(book => {
+          const id = book.querySelector('a').getAttribute('href');
+          const img = book.querySelector('a img').getAttribute('src');
+          const title = book.querySelector('a img').getAttribute('alt');
+
+          books.push({
+            id,
+            title,
+            img
+          })
         })
-      })
+      }
+      cache.set(cacheKey, books, 60 * 60); // cache for 1 hour
+    } catch (error) {
+      res.json(error)
     }
-    res.json(books)
-  } catch (error) {
-    res.json(error)
   }
-})
+
+  res.json(books);
+});
 
 app.get('/search/:keyword', async (req, res) => {
   const { keyword } = req.params;
