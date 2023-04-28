@@ -4,8 +4,7 @@ import { JSDOM } from 'jsdom';
 import { getNumberOfBooks } from './utils/getNumberOfBooks.js';
 import NodeCache from 'node-cache';
 
-
-const cache = new NodeCache();
+const cache = new NodeCache({ stdTTL: 60 * 60 });
 const app = express();
 const PORT = process.env.PORT || 5000
 
@@ -16,10 +15,12 @@ app.get('/books', async (req, res) => {
   const cacheKey = 'booksCacheKey';
   let books = cache.get(cacheKey);
 
+  const itemsPerPage = 50;
+  //const numberOfPages = Math.ceil(books.length / itemsPerPage);
+  const promises = [];
+
   if (!books) {
     const { numberOfPages } = await getNumberOfBooks(`https://www.hindawi.org/books/`);
-    const promises = [];
-
     for (let i = 1; i <= numberOfPages; i++) {
       promises.push(
         axios.get(`https://www.hindawi.org/books/${i}/`)
@@ -54,10 +55,12 @@ app.get('/books', async (req, res) => {
     cache.set(cacheKey, books, 60 * 60); // cache for 1 hour
   }
 
-  res.json(books);
+  const page = parseInt(req.query.page) || 1;
+  const startIndex = (page - 1) * itemsPerPage;
+  const endIndex = page * itemsPerPage;
+
+  res.json(books.slice(startIndex, endIndex));
 });
-
-
 
 
 app.get('/books/:id', async (req, res) => {
