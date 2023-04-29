@@ -8,7 +8,7 @@ const cache = new NodeCache({ stdTTL: 60 * 60 });
 export const getBooksCat = async (req, res) => {
   const cacheKey = `booksCacheKey_${req.params.title}`;
   let books = cache.get(cacheKey);
-  const itemsPerPage = 30;
+  const itemsPerPage = 25;
   if (!books) {
     const { title } = req.params;
     const { numberOfPages } = await getNumberOfBooks(`https://www.hindawi.org/books/categories/${title}/`);
