@@ -56,7 +56,8 @@ export const getBooksCat = async (req, res) => {
   res.json({
     books: slicedBooks,
     currentPage: page,
-    totalPages: Math.ceil(books.length / itemsPerPage)
+    totalPages: Math.ceil(books.length / itemsPerPage),
+    totalBooks: books.length
   });
 
 }
