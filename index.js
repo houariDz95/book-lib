@@ -12,12 +12,12 @@ const PORT = process.env.PORT || 5000
 app.get('/', (req, res) => { res.send("welcome to oumat-iqra library api") })
 
 
-app.use('/books', Books)
+//app.use('/books', Books)
 app.use('/contributors', Author)
 app.use('/categories', Categories);
 app.use('/search', Search);
 app.use('/new', New);
-app.use('/catList', CatList)
+//app.use('/catList', CatList)
 
 
 
