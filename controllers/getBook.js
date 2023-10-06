@@ -1,8 +1,30 @@
 import { JSDOM } from 'jsdom';
 import NodeCache from 'node-cache';
 import axios from 'axios';
+import Book from '../models/book.model.js';
 
 const cache = new NodeCache({ stdTTL: 60 * 60 });
+
+const insertBookToDb = async (data, id) => {
+  try {
+
+      // Try to find a book with the same id in the database
+      const existingBook = await Book.findOne({ bookId: id }); 
+
+      if (!existingBook) {
+        // If the book with the same id doesn't exist, insert it
+        await Book.create(data);
+        console.log(`Inserted book with id: ${id}`);
+      } else {
+        // If the book with the same id already exists, you can choose to skip or update it
+        // For example, you can update the existing book's data with the new data
+        await Book.updateOne({ id }, { $set: bookData });
+        console.log(`Updated book with id: ${id}`);
+      }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 
 export const getBook = async (req, res) => {
@@ -61,6 +83,7 @@ export const getBook = async (req, res) => {
       }
 
       const result = {
+        bookId: id,
         title,
         author,
         authorId,
@@ -75,6 +98,7 @@ export const getBook = async (req, res) => {
       };
 
       cache.set(cacheKey, result);
+      insertBookToDb(result, id)
       res.json(result);
     } catch (error) {
       res.json(error);
