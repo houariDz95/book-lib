@@ -4,11 +4,15 @@ import Author from './routes/author.js';
 import Categories from './routes/categories.js';
 import Search from './routes/search.js'
 import New from './routes/new.js'
+import dotenv from "dotenv"
+
+dotenv.config()
+
 const app = express();
 const PORT = process.env.PORT || 5000
 import mongoose from 'mongoose';
 
-mongoose.connect('mongodb+srv://hoedd294:eddrief95@cluster0.5qt41q6.mongodb.net/?retryWrites=true&w=majority', {
+mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }).then(() => console.log('db contected'));
