@@ -1,5 +1,26 @@
 import axios from 'axios';
 import { JSDOM } from 'jsdom'
+import Author from '../models/contributor.js';
+
+const insertAuthorToDb = async (data, id) => {
+  try {
+      // Try to find a book with the same id in the database
+      const existingBook = await Author.findOne({ bookId: id }); 
+
+      if (!existingBook) {
+        // If the book with the same id doesn't exist, insert it
+        await Author.create(data);
+        console.log(`Inserted book with id: ${id}`);
+      } else {
+        // If the book with the same id already exists, you can choose to skip or update it
+        // For example, you can update the existing book's data with the new data
+        await Author.updateOne({ id }, { $set: bookData });
+        console.log(`Updated book with id: ${id}`);
+      }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 
 
@@ -28,14 +49,16 @@ export const getAuthor = async (req, res) => {
           title
         })
     })
-
-
+    const authorData = { name, img, description, books}
+    insertAuthorToDb(authorData, id)
     res.json({
+      authorId: id,
       name,
       img,
       description,
       books,
     })
+
   } catch (error) {
     res.json(error)
   }

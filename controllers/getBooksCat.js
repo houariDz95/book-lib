@@ -2,7 +2,6 @@ import { JSDOM } from 'jsdom';
 import NodeCache from 'node-cache';
 import axios from 'axios';
 import { getNumberOfBooks } from '../utils/getNumberOfBooks.js';
-import Books from '../models/book.model.js';
 
 const cache = new NodeCache({ stdTTL: 60 * 60 });
 
