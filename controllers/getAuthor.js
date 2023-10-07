@@ -5,7 +5,7 @@ import Author from '../models/contributor.js';
 const insertAuthorToDb = async (data, id) => {
   try {
       // Try to find a book with the same id in the database
-      const existingBook = await Author.findOne({ bookId: id }); 
+      const existingBook = await Author.findOne({ authorId: id }); 
 
       if (!existingBook) {
         // If the book with the same id doesn't exist, insert it
@@ -14,7 +14,7 @@ const insertAuthorToDb = async (data, id) => {
       } else {
         // If the book with the same id already exists, you can choose to skip or update it
         // For example, you can update the existing book's data with the new data
-        await Author.updateOne({ id }, { $set: bookData });
+        await Author.updateOne({ id }, { $set: data });
         console.log(`Updated book with id: ${id}`);
       }
   } catch (error) {
