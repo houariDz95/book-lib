@@ -14,7 +14,7 @@ const insertAuthorToDb = async (data, id) => {
       } else {
         // If the book with the same id already exists, you can choose to skip or update it
         // For example, you can update the existing book's data with the new data
-        await Author.updateOne({ id }, { $set: data });
+        await Author.updateOne({ authorId: id }, { $set: data });
         console.log(`Updated book with id: ${id}`);
       }
   } catch (error) {
@@ -26,6 +26,7 @@ const insertAuthorToDb = async (data, id) => {
 
 export const getAuthor = async (req, res) => {
   const { id } = req.params;
+  console.log(id)
   try {
     const response = await axios.get(`https://www.hindawi.org/contributors/${id}`)
     const dom = new JSDOM(response.data);
@@ -49,15 +50,9 @@ export const getAuthor = async (req, res) => {
           title
         })
     })
-    const authorData = { name, img, description, books}
+    const authorData = { authorId: id, name, img, description, books}
     insertAuthorToDb(authorData, id)
-    res.json({
-      authorId: id,
-      name,
-      img,
-      description,
-      books,
-    })
+    res.json(authorData)
 
   } catch (error) {
     res.json(error)
